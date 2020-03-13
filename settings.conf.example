@@ -1,0 +1,9 @@
+listenAddress = "0.0.0.0"
+listenPort = 162
+dbName = "snmpflapd"
+dbUser = "root"
+dbPassword = ""
+community = ""
+logFilename = "snmpflapd.log"
+sendMail = false
+mailList = ["user1@example.com", "user1@example.com"]

@@ -1,0 +1,17 @@
+[Unit]
+Description=FlapMyPort SNMP Trap Handler
+Requires=mysql.service
+
+[Service]
+Type=simple
+User=root
+Group=wheel
+
+ExecStart=/usr/local/bin/snmpflapd -f /etc/snmpflapd/settings.conf
+ExecReload=/bin/kill -HUP $MAINPID
+ExecStop=/bin/kill $MAINPID
+
+PIDFile=/var/run/snmpflapd.pid
+
+[Install]
+WantedBy=multi-user.target
