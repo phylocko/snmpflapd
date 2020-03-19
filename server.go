@@ -3,12 +3,13 @@ package main
 import (
 	"flag"
 	"fmt"
-	"github.com/BurntSushi/toml"
-	g "github.com/soniah/gosnmp"
 	"log"
 	"net"
 	"os"
 	"time"
+
+	"github.com/BurntSushi/toml"
+	g "github.com/soniah/gosnmp"
 )
 
 const (
@@ -43,6 +44,7 @@ type Config struct {
 var (
 	flagVerbose        bool
 	flagConfigFilename string
+	flagFillCache      bool
 )
 
 var config = Config{
@@ -61,6 +63,7 @@ func init() {
 	// Reading flags
 	flag.StringVar(&flagConfigFilename, "f", defaultConfigFilename, "config file")
 	flag.BoolVar(&flagVerbose, "v", false, "verbose logging")
+	flag.BoolVar(&flagFillCache, "c", false, "fill cache for last hour")
 	flag.Parse()
 
 	// Reading config
@@ -85,6 +88,10 @@ func main() {
 		log.Fatalln(err)
 	}
 	defer connector.db.Close()
+
+	if flagFillCache {
+		connector.fillCache()
+	}
 
 	snmpSema = RequestSemaphore{}
 

@@ -20,10 +20,10 @@ func sendTraps() {
 			event.FillHostName()
 			event.FillIfName()
 			event.FillIfAlias()
-			err := connector.saveLinkEvent(&event)
-			if err != nil {
-				fmt.Printf("%v\n", err)
-			}
+			// err := connector.saveLinkEvent(&event)
+			// if err != nil {
+			// 	fmt.Printf("%v\n", err)
+			// }
 		}
 		break
 		//time.Sleep(time.Second * 4)

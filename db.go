@@ -2,10 +2,11 @@ package main
 
 import (
 	"fmt"
-	_ "github.com/go-sql-driver/mysql"
-	"github.com/jmoiron/sqlx"
 	"log"
 	"sync"
+
+	_ "github.com/go-sql-driver/mysql"
+	"github.com/jmoiron/sqlx"
 )
 
 // Connector is an object to connect the database
