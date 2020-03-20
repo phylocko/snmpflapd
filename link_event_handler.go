@@ -49,9 +49,9 @@ type linkEvent struct {
 	ifIndex       int
 	ifAdminStatus int
 	ifOperStatus  int
-	ifName        string
-	ifAlias       string
-	hostName      string
+	ifName        *string
+	ifAlias       *string
+	hostName      *string
 	ipAddress     net.IP
 	time          time.Time
 	timeTicks     uint
@@ -60,16 +60,22 @@ type linkEvent struct {
 func (le *linkEvent) String() string {
 	time := le.time.Format(dateLayout)
 
-	rHostname := le.hostName
-	if rHostname == "" {
-		rHostname = le.ipAddress.String()
+	hostName := le.ipAddress.String()
+	if le.hostName != nil {
+		hostName = *le.hostName
 	}
-	return fmt.Sprintf("time='%s' hostname='%s' ifName='%s' ifIndex='%d' ifAlias='%s' ifStateText='%s'",
-		time, rHostname,
-		le.ifName,
-		le.ifIndex,
-		le.ifAlias,
-		le.ifStateText())
+
+	ifName := "NULL"
+	if le.ifName != nil {
+		ifName = *le.ifName
+	}
+	ifAlias := "NULL"
+	if le.ifAlias != nil {
+		ifAlias = *le.ifAlias
+	}
+
+	return fmt.Sprintf("time=%s host=%s ifName=%s ifIndex=%d ifAlias=%s status=%s",
+		time, hostName, ifName, le.ifIndex, ifAlias, le.ifStateText())
 }
 
 func (le *linkEvent) ifStateText() string {
@@ -119,8 +125,9 @@ func (le *linkEvent) FromSnmpPacket(p *g.SnmpPacket, addr net.IP) {
 
 		if strings.Contains(variable.Name, ifNameVarBindPrefixJunOS) {
 			ifNameBytes, ok := variable.Value.([]uint8)
+			ifName := string(ifNameBytes)
 			if ok {
-				le.ifName = string(ifNameBytes)
+				le.ifName = &ifName
 			} else {
 				log.Println(le, "empty ifNameVarBindPrefixJunOS")
 			}
@@ -188,15 +195,15 @@ func (le *linkEvent) FetchMissingData() {
 
 	logVerbose(fmt.Sprintln(le.sid, "fetching missing data"))
 
-	if le.hostName == "" {
+	if le.hostName == nil {
 		le.FillHostName()
 	}
 
-	if le.ifName == "" {
+	if le.ifName == nil {
 		le.FillIfName()
 	}
 
-	if le.ifAlias == "" {
+	if le.ifAlias == nil {
 		le.FillIfAlias()
 	}
 }
@@ -218,7 +225,7 @@ func (le *linkEvent) FillHostName() {
 		return
 
 	} else {
-		le.hostName = *hostName
+		le.hostName = hostName
 		logVerbose(fmt.Sprintf("%s received hostname '%s' from %s via SNMP", le.sid, le.hostName, le.ipAddress))
 	}
 
@@ -244,7 +251,7 @@ func (le *linkEvent) FillIfName() {
 
 	} else {
 		logVerbose(fmt.Sprintf("%s received ifName '%s' from %s via SNMP", le.sid, le.ifName, le.ipAddress))
-		le.ifName = *ifName
+		le.ifName = ifName
 	}
 
 	connector.putCachedIfName(le)
@@ -269,7 +276,7 @@ func (le *linkEvent) FillIfAlias() {
 		return
 
 	} else {
-		le.ifAlias = *ifAlias
+		le.ifAlias = ifAlias
 		logVerbose(fmt.Sprintf("%s received ifAlias '%s' from %s via SNMP", le.sid, le.ifAlias, le.ipAddress))
 	}
 
@@ -355,7 +362,7 @@ func (c *Connector) getCachedIfName(le *linkEvent) bool {
 		return false
 	}
 
-	le.ifName = cachedIfName
+	le.ifName = &cachedIfName
 	return true
 }
 
@@ -393,7 +400,7 @@ func (c *Connector) getCachedIfAlias(le *linkEvent) bool {
 		return false
 	}
 
-	le.ifAlias = cachedIfAlias
+	le.ifAlias = &cachedIfAlias
 	return true
 }
 
@@ -432,7 +439,7 @@ func (c *Connector) getCachedHostname(le *linkEvent) bool {
 		return false
 	}
 
-	le.hostName = cachedHostname
+	le.hostName = &cachedHostname
 	return true
 }
 
