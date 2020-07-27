@@ -88,10 +88,6 @@ func main() {
 
 	snmpSema = RequestSemaphore{}
 
-	// Notify queue
-	mailQueue = Queue{}
-	go RunQueue()
-
 	// Periodic DB clean up
 	go RunDBCleanUp()
 

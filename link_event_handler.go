@@ -58,7 +58,7 @@ type linkEvent struct {
 }
 
 func (le *linkEvent) String() string {
-	time := le.time.Format(dateLayout)
+	eventTime := le.time.Format(dateLayout)
 
 	hostName := le.ipAddress.String()
 	if le.hostName != nil {
@@ -74,8 +74,8 @@ func (le *linkEvent) String() string {
 		ifAlias = *le.ifAlias
 	}
 
-	return fmt.Sprintf("time=%s host=%s ifName=%s ifIndex=%d ifAlias=%s status=%s",
-		time, hostName, ifName, le.ifIndex, ifAlias, le.ifStateText())
+	return fmt.Sprintf("eventTime=%s host=%s ifName=%s ifIndex=%d ifAlias=%s status=%s",
+		eventTime, hostName, ifName, le.ifIndex, ifAlias, le.ifStateText())
 }
 
 func (le *linkEvent) ifStateText() string {
@@ -168,8 +168,6 @@ func LinkEventHandler(p *g.SnmpPacket, addr *net.UDPAddr) {
 		log.Println(event.sid, "unable to update link event:", err)
 	}
 
-	// Put it to the notification Queue
-	QueueLinkEvent(event)
 }
 
 // getEventOID returns oid from OID Reference that is in an SnmpPacket
@@ -215,7 +213,7 @@ func (le *linkEvent) FillHostName() {
 
 	// 1. Try to get the value from cache
 	if connector.getCachedHostname(le) {
-		logVerbose(fmt.Sprintln(le.sid, "used cached hostName", le.hostName))
+		logVerbose(fmt.Sprintln(le.sid, "used cached hostName", *le.hostName))
 		return
 	}
 
@@ -226,7 +224,7 @@ func (le *linkEvent) FillHostName() {
 
 	} else {
 		le.hostName = hostName
-		logVerbose(fmt.Sprintf("%s received hostname '%s' from %s via SNMP", le.sid, le.hostName, le.ipAddress))
+		logVerbose(fmt.Sprintf("%s received hostname '%s' from %s via SNMP", le.sid, *le.hostName, le.ipAddress))
 	}
 
 	connector.putCachedHostname(le)
@@ -240,7 +238,7 @@ func (le *linkEvent) FillIfName() {
 
 	// 1. Try to get the value from cache
 	if connector.getCachedIfName(le) {
-		logVerbose(fmt.Sprintf("%s used cached ifName %s", le.sid, le.ifName))
+		logVerbose(fmt.Sprintf("%s used cached ifName %s", le.sid, *le.ifName))
 		return
 	}
 
@@ -250,8 +248,8 @@ func (le *linkEvent) FillIfName() {
 		return
 
 	} else {
-		logVerbose(fmt.Sprintf("%s received ifName '%s' from %s via SNMP", le.sid, le.ifName, le.ipAddress))
 		le.ifName = ifName
+		logVerbose(fmt.Sprintf("%s received ifName '%s' from %s via SNMP", le.sid, *le.ifName, le.ipAddress))
 	}
 
 	connector.putCachedIfName(le)
@@ -265,7 +263,7 @@ func (le *linkEvent) FillIfAlias() {
 
 	// 1. Try to get the value from cache
 	if connector.getCachedIfAlias(le) {
-		logVerbose(fmt.Sprintf("%s used cached ifAlias %s", le.sid, le.ifAlias))
+		logVerbose(fmt.Sprintf("%s used cached ifAlias %s", le.sid, *le.ifAlias))
 		return
 	}
 
@@ -277,7 +275,7 @@ func (le *linkEvent) FillIfAlias() {
 
 	} else {
 		le.ifAlias = ifAlias
-		logVerbose(fmt.Sprintf("%s received ifAlias '%s' from %s via SNMP", le.sid, le.ifAlias, le.ipAddress))
+		logVerbose(fmt.Sprintf("%s received ifAlias '%s' from %s via SNMP", le.sid, *ifAlias, &le.ipAddress))
 	}
 
 	connector.putCachedIfAlias(le)
@@ -358,7 +356,7 @@ func (c *Connector) getCachedIfName(le *linkEvent) bool {
 
 	cachedIfName := ""
 	if err := c.db.Get(&cachedIfName, sql, cacheIfNameMinutes, le.ipAddress.String(), le.ifIndex); err != nil {
-		logVerbose(fmt.Sprintln(le.sid, "no cached ifname"))
+		logVerbose(fmt.Sprintln(le.sid, "no cached ifName"))
 		return false
 	}
 
@@ -384,7 +382,7 @@ func (c *Connector) putCachedIfName(le *linkEvent) {
 		log.Println(le.sid, err, le.String())
 		return
 	}
-	logVerbose(fmt.Sprintf("%s put values ('%s', '%d', '%s') to cache_ifname", le.sid, le.ifName, le.ifIndex, le.hostName))
+	logVerbose(fmt.Sprintf("%s put values ('%s', '%d', '%d') to cache_ifname", le.sid, *le.ifName, le.ifIndex, le.hostName))
 }
 
 func (c *Connector) getCachedIfAlias(le *linkEvent) bool {
@@ -422,7 +420,7 @@ func (c *Connector) putCachedIfAlias(le *linkEvent) {
 		log.Println(le.sid, err)
 		return
 	}
-	logVerbose(fmt.Sprintf("%s put values ('%s', '%d', '%s') to cache_ifalias", le.sid, le.ifAlias, le.ifIndex, le.hostName))
+	logVerbose(fmt.Sprintf("%s put values ('%s', '%d', '%s') to cache_ifalias", le.sid, *le.ifAlias, le.ifIndex, le.ipAddress))
 
 }
 
@@ -460,5 +458,5 @@ func (c *Connector) putCachedHostname(le *linkEvent) {
 		log.Println(err)
 		return
 	}
-	logVerbose(fmt.Sprintf("%s put values ('%s', '%s') to cache_hostname", le.sid, le.hostName, le.ipAddress))
+	logVerbose(fmt.Sprintf("%s put values ('%s', '%s') to cache_hostname", le.sid, *le.hostName, le.ipAddress))
 }
