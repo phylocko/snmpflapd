@@ -47,3 +47,5 @@ CREATE TABLE `cache_ifalias`
     `ifAlias`   varchar(50)           DEFAULT NULL,
     PRIMARY KEY (`id`)
 );
+CREATE INDEX idx_sid USING btree ON ports (sid);
+CREATE INDEX idx_time USING btree ON ports (time);
