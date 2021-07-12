@@ -34,9 +34,9 @@ const (
 	ifAdminStatusDOWN        = 2
 	ifOperStatusUP           = 1
 	ifOperStatusDOWN         = 2
-	cacheHostnameMinutes     = 60
-	cacheIfNameMinutes       = 30
-	cacheIfAliasMinutes      = 5
+	cacheHostnameMinutes     = 360
+	cacheIfNameMinutes       = 180
+	cacheIfAliasMinutes      = 60
 	dateLayout               = "2006-01-02 15:04:05"
 )
 
@@ -263,7 +263,7 @@ func (le *linkEvent) FillIfAlias() {
 
 	// 1. Try to get the value from cache
 	if connector.getCachedIfAlias(le) {
-		logVerbose(fmt.Sprintf("%s used cached ifAlias %s", le.sid, *le.ifAlias))
+		logVerbose(fmt.Sprintf("%s used cached ifAlias '%s'", le.sid, *le.ifAlias))
 		return
 	}
 
@@ -397,7 +397,6 @@ func (c *Connector) getCachedIfAlias(le *linkEvent) bool {
 		logVerbose(fmt.Sprintln(le.sid, "no cached ifAlias"))
 		return false
 	}
-
 	le.ifAlias = &cachedIfAlias
 	return true
 }
