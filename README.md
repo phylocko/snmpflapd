@@ -20,22 +20,22 @@ to find out host names, ifNames and ifAliases, storing it into MySQL.
 ## 1. Create a DB schema
 
 ```
-mysql> create database handler;
-# mysql handler < schema.sql
+mysql> create database snmpflapd;
+# mysql snmpflapd < schema.sql
 ```
 
 ## 2. Create a config file
 
-**handler.conf:**
+**settings.conf:**
 ```
 listenAddress = "0.0.0.0"
 listenPort = 162
 dbHost = "localhost"
-dbName = "handler"
+dbName = "snmpflapd"
 dbUser = "root"
 dbPassword = ""
 community = "public"
-logFilename = "/var/log/handler.log"
+logFilename = "/var/log/snmpflapd.log"
 sendMail = false
 mailList = ["user1@example.com", "user1@example.com"]
 ```
@@ -44,7 +44,7 @@ mailList = ["user1@example.com", "user1@example.com"]
 
 ## 3. Run snmpflapd
 ```
-> ./snmpflapd -f handler.conf
+> ./snmpflapd -f settings.conf
 ```
 Check your log file for errors.
 
@@ -53,7 +53,7 @@ Check your log file for errors.
 If you wish to make a build for a Linux 64-bit machine:
 
 ```
-GOOS=linux GOARCH=amd64 go build -o handler
+GOOS=linux GOARCH=amd64 go build -o snmpflapd
 ```
 
 ---
