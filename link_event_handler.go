@@ -10,7 +10,7 @@ package main
 import (
 	"fmt"
 	"github.com/chilts/sid"
-	g "github.com/soniah/gosnmp"
+	g "github.com/gosnmp/gosnmp"
 	"log"
 	"net"
 	"strconv"

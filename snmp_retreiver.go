@@ -2,7 +2,7 @@ package main
 
 import (
 	"errors"
-	g "github.com/soniah/gosnmp"
+	g "github.com/gosnmp/gosnmp"
 	"log"
 	"net"
 	"sync"
@@ -19,7 +19,6 @@ func doSNMPRequest(oid string, ip net.IP) (pdu *g.SnmpPacket, err error) {
 	c.Community = config.Community
 	c.Target = ip.String()
 
-
 	if err = c.Connect(); err != nil {
 		log.Println(err)
 		return nil, err
@@ -30,7 +29,6 @@ func doSNMPRequest(oid string, ip net.IP) (pdu *g.SnmpPacket, err error) {
 }
 
 func getSNMPString(oid string, ip net.IP) (val *string, err error) {
-
 
 	snmpSema.mx.Lock()
 	defer snmpSema.mx.Unlock()

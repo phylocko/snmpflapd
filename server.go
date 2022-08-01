@@ -4,7 +4,7 @@ import (
 	"flag"
 	"fmt"
 	"github.com/BurntSushi/toml"
-	g "github.com/soniah/gosnmp"
+	g "github.com/gosnmp/gosnmp"
 	"log"
 	"net"
 	"os"
