@@ -3,12 +3,13 @@ package main
 import (
 	"flag"
 	"fmt"
-	"github.com/BurntSushi/toml"
-	g "github.com/gosnmp/gosnmp"
 	"log"
 	"net"
 	"os"
 	"time"
+
+	"github.com/BurntSushi/toml"
+	g "github.com/gosnmp/gosnmp"
 )
 
 const (
@@ -74,6 +75,7 @@ func main() {
 	// Logging setup
 	f, err := os.OpenFile(config.LogFilename, os.O_RDWR|os.O_CREATE|os.O_APPEND, 0666)
 	if err != nil {
+		fmt.Println(err)
 		log.Fatalln(err)
 	}
 	defer f.Close()
@@ -82,6 +84,7 @@ func main() {
 
 	connector, err = MakeDB(config.DBName, config.DBUser, config.DBPassword)
 	if err != nil {
+		fmt.Println(err)
 		log.Fatalln(err)
 	}
 	defer connector.db.Close()
@@ -98,6 +101,7 @@ func main() {
 	listenSocket := fmt.Sprintf("%v:%v", config.ListenAddress, config.ListenPort)
 	tlErr := tl.Listen(listenSocket)
 	if tlErr != nil {
+		fmt.Println(tlErr)
 		log.Fatalln(tlErr)
 	}
 
@@ -105,6 +109,7 @@ func main() {
 
 func readConfig(file *string) {
 	if _, err := toml.DecodeFile(*file, &config); err != nil {
+		fmt.Println(err)
 		log.Fatalln(err)
 	}
 }
