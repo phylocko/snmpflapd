@@ -5,5 +5,3 @@ dbUser = "root"
 dbPassword = ""
 community = ""
 logFilename = "snmpflapd.log"
-sendMail = false
-mailList = ["user1@example.com", "user1@example.com"]

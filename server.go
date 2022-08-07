@@ -21,7 +21,6 @@ const (
 	defaultDBName          = "snmpflapd"
 	defaultDBPassword      = ""
 	defaultCommunity       = ""
-	defaultSendMail        = false
 	queueInterval          = 30
 	defaultCleanUpInterval = 60
 )
@@ -35,8 +34,6 @@ type Config struct {
 	DBUser          string
 	DBPassword      string
 	Community       string
-	SendMail        bool
-	MailList        []string
 	CleanUpInterval int
 }
 
@@ -54,8 +51,8 @@ var config = Config{
 	DBUser:          defaultDBUser,
 	DBPassword:      defaultDBPassword,
 	Community:       defaultCommunity,
-	SendMail:        defaultSendMail,
-	CleanUpInterval: defaultCleanUpInterval}
+	CleanUpInterval: defaultCleanUpInterval,
+}
 
 func init() {
 
