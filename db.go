@@ -2,10 +2,11 @@ package main
 
 import (
 	"fmt"
-	_ "github.com/go-sql-driver/mysql"
-	"github.com/jmoiron/sqlx"
 	"log"
 	"sync"
+
+	_ "github.com/go-sql-driver/mysql"
+	"github.com/jmoiron/sqlx"
 )
 
 // Connector is an object to connect the database
@@ -17,9 +18,9 @@ type Connector struct {
 var connector *Connector
 
 // MakeDB returns an SQL Connector object to make queries
-func MakeDB(dbName, dbUser, dbPassword string) (*Connector, error) {
+func MakeDB(dbHost, dbName, dbUser, dbPassword string) (*Connector, error) {
 
-	dataSourceName := fmt.Sprintf("%s:%s@/%s", dbUser, dbPassword, dbName)
+	dataSourceName := fmt.Sprintf("%s:%s@tcp(%s)/%s", dbUser, dbPassword, dbHost, dbName)
 	db, err := sqlx.Open("mysql", dataSourceName)
 	if err != nil {
 		return nil, err

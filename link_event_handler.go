@@ -9,13 +9,14 @@ package main
 
 import (
 	"fmt"
-	"github.com/chilts/sid"
-	g "github.com/gosnmp/gosnmp"
 	"log"
 	"net"
 	"strconv"
 	"strings"
 	"time"
+
+	"github.com/chilts/sid"
+	g "github.com/gosnmp/gosnmp"
 )
 
 const (

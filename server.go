@@ -6,6 +6,7 @@ import (
 	"log"
 	"net"
 	"os"
+	"strconv"
 	"time"
 
 	"github.com/BurntSushi/toml"
@@ -17,6 +18,7 @@ const (
 	defaultLogFilename     = "snmpflapd.log"
 	defaultListenAddress   = "0.0.0.0"
 	defaultListenPort      = 162
+	defaultDBHost          = "127.0.0.1"
 	defaultDBUser          = "root"
 	defaultDBName          = "snmpflapd"
 	defaultDBPassword      = ""
@@ -47,6 +49,7 @@ var config = Config{
 	LogFilename:     defaultLogFilename,
 	ListenAddress:   defaultListenAddress,
 	ListenPort:      defaultListenPort,
+	DBHost:          defaultDBHost,
 	DBName:          defaultDBName,
 	DBUser:          defaultDBUser,
 	DBPassword:      defaultDBPassword,
@@ -62,7 +65,8 @@ func init() {
 	flag.Parse()
 
 	// Reading config
-	readConfig(&flagConfigFilename)
+	readConfigFile(&flagConfigFilename)
+	readConfigEnv()
 
 }
 
@@ -79,7 +83,7 @@ func main() {
 	log.SetOutput(f)
 	log.Println("snmpflapd started")
 
-	connector, err = MakeDB(config.DBName, config.DBUser, config.DBPassword)
+	connector, err = MakeDB(config.DBHost, config.DBName, config.DBUser, config.DBPassword)
 	if err != nil {
 		fmt.Println(err)
 		log.Fatalln(err)
@@ -104,11 +108,56 @@ func main() {
 
 }
 
-func readConfig(file *string) {
+func readConfigFile(file *string) {
 	if _, err := toml.DecodeFile(*file, &config); err != nil {
-		fmt.Println(err)
-		log.Fatalln(err)
+		msg := fmt.Sprintf("%s not found. Suppose we're using environment variables", *file)
+		fmt.Println(msg)
+		log.Println(msg)
 	}
+}
+
+func readConfigEnv() {
+
+	if logFilename, exists := os.LookupEnv("LOGFILE"); exists {
+		config.LogFilename = logFilename
+	}
+
+	if listenAddress, exists := os.LookupEnv("LISTEN_ADDRESS"); exists {
+		config.ListenAddress = listenAddress
+	}
+
+	if listenPort, exists := os.LookupEnv("LISTEN_PORT"); exists {
+		if intPort, error := strconv.Atoi(listenPort); error != nil {
+			msg := "Wrong environment variable LISTEN_PORT"
+			fmt.Println(msg)
+			log.Fatalln(msg)
+
+		} else {
+			config.ListenPort = intPort
+		}
+
+	}
+
+	if dbHost, exists := os.LookupEnv("DBHOST"); exists {
+		config.DBHost = dbHost
+	}
+
+	if dbName, exists := os.LookupEnv("DBNAME"); exists {
+		config.DBName = dbName
+	}
+
+	if dbUser, exists := os.LookupEnv("DBUSER"); exists {
+		config.DBUser = dbUser
+	}
+
+	if dbPassword, exists := os.LookupEnv("DBPASSWORD"); exists {
+		config.DBPassword = dbPassword
+	}
+
+	if community, exists := os.LookupEnv("COMMUNITY"); exists {
+		config.Community = community
+	}
+
 }
 
 func handleTrap(packet *g.SnmpPacket, addr *net.UDPAddr) {
