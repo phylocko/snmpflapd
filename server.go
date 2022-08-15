@@ -41,8 +41,11 @@ type Config struct {
 
 // flags
 var (
+	version            string
+	build              string
 	flagVerbose        bool
 	flagConfigFilename string
+	flagVersion        bool
 )
 
 var config = Config{
@@ -60,8 +63,9 @@ var config = Config{
 func init() {
 
 	// Reading flags
-	flag.StringVar(&flagConfigFilename, "f", defaultConfigFilename, "config file")
-	flag.BoolVar(&flagVerbose, "v", false, "verbose logging")
+	flag.StringVar(&flagConfigFilename, "f", defaultConfigFilename, "Location of config file")
+	flag.BoolVar(&flagVerbose, "v", false, "Enable verbose logging")
+	flag.BoolVar(&flagVersion, "V", false, "Print version information and quit")
 	flag.Parse()
 
 	// Reading config
@@ -71,6 +75,13 @@ func init() {
 }
 
 func main() {
+
+	if flagVersion {
+		build := fmt.Sprintf("FlapMyPort snmpflapd version %s, build %s", version, build)
+		fmt.Println(build)
+		os.Exit(0)
+	}
+
 	var err error
 
 	// Logging setup

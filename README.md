@@ -6,9 +6,8 @@ to find out host names, ifNames and ifAliases, storing it into MySQL.
 # Why you should use it? #
 
 - **Performance**. It handles traps asynchronously and will never loose one!
-- **Speed**. Host names, ifNames and ifAliases are cached to prevent unnecessary SNMP Get requests.
-- **FlapMyPort**. It does well with the <a href="http://flapmyport.com">FlapMyPort</a> project 
-  and is developed to replace the outdated <a href="https://github.com/Pavel-Polyakov/trapharvester">TrapHandler</a>.
+- **Speed**. Host names, ifNames and ifAliases are cached to prevent unnecessary SNMP Get requests
+- **FlapMyPort**. It does well with the <a href="http://flapmyport.com">FlapMyPort</a> monitoring system
 
 # What do you need to deploy it?
 - A linux server with a MySQL database running
@@ -36,11 +35,11 @@ dbUser = "root"
 dbPassword = ""
 community = "public"
 logFilename = "/var/log/snmpflapd.log"
-sendMail = false
-mailList = ["user1@example.com", "user1@example.com"]
 ```
 
-***Note:*** *Email notifications not implemented yet :(*
+> settings.conf is optional. You may use environment variables instaed
+> Available environment variables are
+> LISTEN_ADDRESS, LISTEN_PORT, DBHOST, DBNAME, DBUSER, DBPASSWORD, COMMUNITY, LOGFILE
 
 ## 3. Run snmpflapd
 ```
@@ -50,10 +49,12 @@ Check your log file for errors.
 
 # How to build #
 
+Use `build.sh` instead of `go build`!
+
 If you wish to make a build for a Linux 64-bit machine:
 
 ```
-GOOS=linux GOARCH=amd64 go build -o snmpflapd
+GOOS=linux GOARCH=amd64 build.sh
 ```
 
 ---
