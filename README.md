@@ -54,7 +54,7 @@ Use `build.sh` instead of `go build`!
 If you wish to make a build for a Linux 64-bit machine:
 
 ```
-GOOS=linux GOARCH=amd64 build.sh
+GOOS=linux GOARCH=amd64 ./build.sh
 ```
 
 ---

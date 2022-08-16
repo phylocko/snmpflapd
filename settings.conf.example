@@ -1,7 +1,7 @@
 listenAddress = "0.0.0.0"
 listenPort = 162
-dbName = "snmpflapd"
-dbUser = "root"
-dbPassword = ""
-community = ""
+dbName = "flapmyport"
+dbUser = "flapmyport"
+dbPassword = flapmyport
+community = "public"
 logFilename = "snmpflapd.log"
