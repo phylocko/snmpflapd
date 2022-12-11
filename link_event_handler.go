@@ -152,7 +152,7 @@ func (le *linkEvent) FromSnmpPacket(p *g.SnmpPacket, addr net.IP) {
 
 // LinkEventHandler handles linkUP/linkDOWN snmp traps
 func LinkEventHandler(p *g.SnmpPacket, addr *net.UDPAddr) {
-	event := linkEvent{time: time.Now().Local()}
+	event := linkEvent{time: time.Now().UTC()}
 	event.sid = sid.Id() // This is for unique trap identification
 	event.FromSnmpPacket(p, addr.IP)
 
