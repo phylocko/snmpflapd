@@ -3,3 +3,4 @@ output
 snmpflapd.conf
 snmpflapd.log
 settings.conf
+build
