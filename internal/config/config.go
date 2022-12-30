@@ -72,7 +72,7 @@ func ReadConfig() {
 }
 
 func ReadFile(fileName string, cfg *config) {
-	if _, err := toml.DecodeFile(fileName, &Config); err != nil {
+	if _, err := toml.DecodeFile(fileName, &cfg); err != nil {
 		msg := fmt.Sprintf("%s not found. Suppose we're using environment variables", fileName)
 		fmt.Println(msg)
 		log.Println(msg)
