@@ -3,8 +3,9 @@ package retriever
 import (
 	"errors"
 	"fmt"
-	"snmpflapd/internal/config"
 	"sync"
+
+	"snmpflapd/internal/config"
 
 	snmp "github.com/gosnmp/gosnmp"
 )

@@ -3,7 +3,6 @@ package config
 import (
 	"flag"
 	"fmt"
-	"log"
 	"os"
 	"strconv"
 
@@ -13,6 +12,7 @@ import (
 const (
 	defaultConfigFilename  = "settings.conf"
 	defaultLogFilename     = "snmpflapd.log"
+	defaultLogLevel        = "warning"
 	defaultListenAddress   = "0.0.0.0"
 	defaultListenPort      = 162
 	defaultDBHost          = "127.0.0.1"
@@ -32,6 +32,7 @@ var (
 
 type config struct {
 	LogFilename     string
+	LogLevel        string
 	ListenAddress   string
 	ListenPort      int
 	DBHost          string
@@ -54,6 +55,7 @@ func ReadFlags() {
 func ReadConfig() {
 	cfg := config{
 		LogFilename:     defaultLogFilename,
+		LogLevel:        defaultLogLevel,
 		ListenAddress:   defaultListenAddress,
 		ListenPort:      defaultListenPort,
 		DBHost:          defaultDBHost,
@@ -75,7 +77,6 @@ func ReadFile(fileName string, cfg *config) {
 	if _, err := toml.DecodeFile(fileName, &cfg); err != nil {
 		msg := fmt.Sprintf("%s not found. Suppose we're using environment variables", fileName)
 		fmt.Println(msg)
-		log.Println(msg)
 	}
 }
 
@@ -83,6 +84,10 @@ func ReadEnv(cfg *config) {
 
 	if logFilename, exists := os.LookupEnv("LOGFILE"); exists {
 		cfg.LogFilename = logFilename
+	}
+
+	if logLevel, exists := os.LookupEnv("LOGLEVEL"); exists {
+		cfg.LogLevel = logLevel
 	}
 
 	if listenAddress, exists := os.LookupEnv("LISTEN_ADDRESS"); exists {
@@ -93,7 +98,6 @@ func ReadEnv(cfg *config) {
 		if intPort, error := strconv.Atoi(listenPort); error != nil {
 			msg := "Wrong environment variable LISTEN_PORT"
 			fmt.Println(msg)
-			log.Fatalln(msg)
 
 		} else {
 			cfg.ListenPort = intPort

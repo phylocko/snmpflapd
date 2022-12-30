@@ -3,12 +3,15 @@ package main
 import (
 	"fmt"
 	"os"
+	"time"
+
 	"snmpflapd/internal/cache"
 	"snmpflapd/internal/config"
 	"snmpflapd/internal/db"
 	"snmpflapd/internal/logger"
 	"snmpflapd/internal/server"
-	"time"
+
+	"github.com/apex/log"
 )
 
 var (
@@ -17,6 +20,7 @@ var (
 )
 
 func main() {
+
 	config.ReadFlags()
 
 	if config.FlagVersion {
@@ -26,7 +30,7 @@ func main() {
 
 	config.ReadConfig()
 
-	logger.SetUpLogger(config.Config.LogFilename)
+	logger.SetUpLogger(config.Config.LogFilename, config.Config.LogLevel)
 
 	db.CreateDB(
 		config.Config.DBHost,
@@ -44,12 +48,15 @@ func main() {
 		}
 	}()
 
+	fmt.Println("Snmpflapd started.")
+
 	listener := server.New()
 
 	socket := fmt.Sprintf("%v:%v", config.Config.ListenAddress, config.Config.ListenPort)
 	err := listener.Listen(socket)
 	if err != nil {
-		logger.L.Fatalln(err)
+		log.WithError(err).Error("Unable to create server.")
+		os.Exit(1)
 	}
 
 }

@@ -1,11 +1,12 @@
 package server
 
 import (
+	"fmt"
 	"net"
 
 	"snmpflapd/internal/flap"
-	"snmpflapd/internal/logger"
 
+	"github.com/apex/log"
 	snmp "github.com/gosnmp/gosnmp"
 )
 
@@ -22,13 +23,13 @@ func HandleFlap(p *snmp.SnmpPacket, addr *net.UDPAddr) {
 	f := flap.New(p, addr.IP)
 
 	if err := f.Save(); err != nil {
-		logger.L.Printf("unable to save flap: %s", err)
+		log.Warn(fmt.Sprintf("Unable to save flap. %s", err))
 		return
 	}
 
 	f.FetchMissingData()
 	if err := f.Update(); err != nil {
-		logger.L.Printf("unable to update flap: %s", err)
+		log.Warn(fmt.Sprintf("Unable to update flap. %s", err))
 		return
 	}
 }

@@ -3,15 +3,17 @@ package flap
 import (
 	"fmt"
 	"net"
-	"snmpflapd/internal/cache"
-	"snmpflapd/internal/db"
-	"snmpflapd/internal/logger"
-	"snmpflapd/internal/retriever"
 	"strings"
 	"time"
 
+	"snmpflapd/internal/cache"
+	"snmpflapd/internal/db"
+	"snmpflapd/internal/retriever"
+
 	"github.com/chilts/sid"
 	snmp "github.com/gosnmp/gosnmp"
+
+	"github.com/apex/log"
 )
 
 const (
@@ -171,14 +173,17 @@ func (f *Flap) FillHostname() {
 
 	// 2. Get value from SNMP and put it to the cache
 	if value, err := retriever.GetString(sysNameOID, f.ipAddress); err != nil {
-		logger.L.Printf("unable to get hostname via snmp from %s. %s", f.ipAddress, err)
+		log.WithError(err).Error(fmt.Sprintf("Unable to get hostname from %s", f.ipAddress))
 		return
 
 	} else {
 		f.hostName = value
 	}
 
-	cache.PutHostname(f.ipAddress, *f.hostName)
+	err := cache.PutHostname(f.ipAddress, *f.hostName)
+	if err != nil {
+		log.WithError(err).Error("PutHostname error")
+	}
 }
 
 // FillIfName tries to get a interface name from cache, then from the device via SNMP request
@@ -193,14 +198,17 @@ func (f *Flap) FillIfName() {
 	// 2. Get value from SNMP and put it to the cache
 	oid := fmt.Sprintf("%s%d", ifNameOIDPrefix, f.ifIndex)
 	if value, err := retriever.GetString(oid, f.ipAddress); err != nil {
-		logger.L.Printf("unable to get ifalias via snmp from %s for %d. %s", f.ipAddress, f.ifIndex, err)
+		log.WithError(err).Error(fmt.Sprintf("Unable to get ifname from %s for %d", f.ipAddress, f.ifIndex))
 		return
 
 	} else {
 		f.ifName = value
 	}
 
-	cache.PutIfName(f.ipAddress, f.ifIndex, *f.ifName)
+	err := cache.PutIfName(f.ipAddress, f.ifIndex, *f.ifName)
+	if err != nil {
+		log.WithError(err).Error("PutIfName error")
+	}
 }
 
 // FillIfAlias tries to get a interface name from cache, then from the device via SNMP request
@@ -215,12 +223,15 @@ func (f *Flap) FillIfAlias() {
 	// 2. Get value from SNMP and put it to the cache
 	oid := fmt.Sprintf("%s%d", ifAliasOIDPrefix, f.ifIndex)
 	if value, err := retriever.GetString(oid, f.ipAddress); err != nil {
-		logger.L.Printf("unable to get ifalias via snmp from %s for %d. %s", f.ipAddress, f.ifIndex, err)
+		log.WithError(err).Error(fmt.Sprintf("Unable to get ifalias from %s for %d", f.ipAddress, f.ifIndex))
 		return
 
 	} else {
 		f.ifAlias = value
 	}
 
-	cache.PutIfAlias(f.ipAddress, f.ifIndex, *f.ifName)
+	err := cache.PutIfAlias(f.ipAddress, f.ifIndex, *f.ifName)
+	if err != nil {
+		log.WithError(err).Error("PutIfAlias error")
+	}
 }

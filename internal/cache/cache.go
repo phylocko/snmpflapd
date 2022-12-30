@@ -1,9 +1,9 @@
 package cache
 
 import (
-	"log"
 	"snmpflapd/internal/db"
-	"snmpflapd/internal/logger"
+
+	"github.com/apex/log"
 )
 
 const (
@@ -14,20 +14,21 @@ const (
 
 func CleanUp() {
 
-	logger.L.Printf("Cleanup DB started")
+	log.Info("DB Cleanup started")
+
 	cleanUpHostnameSQL := `DELETE FROM cache_hostname WHERE time < now() - INTERVAL ? MINUTE;`
 	if _, err := db.Exec(cleanUpHostnameSQL, cacheHostnameMinutes); err != nil {
-		log.Println(err)
+		log.WithError(err).Error("Unable to execute cleanUpHostnameSQL.")
 	}
 
 	cleanUpIfNameSQL := `DELETE FROM cache_ifname WHERE time < now() - INTERVAL ? MINUTE;`
 	if _, err := db.Exec(cleanUpIfNameSQL, cacheIfNameMinutes); err != nil {
-		log.Println(err)
+		log.WithError(err).Error("Unable to execute cleanUpIfNameSQL.")
 	}
 
 	cleanUpIfAliasSQL := `DELETE FROM cache_ifalias WHERE time < now() - INTERVAL ? MINUTE;`
 	if _, err := db.Exec(cleanUpIfAliasSQL, cacheIfAliasMinutes); err != nil {
-		log.Println(err)
+		log.WithError(err).Error("Unable to execute cleanUpIfAliasSQL.")
 	}
 }
 
@@ -51,7 +52,6 @@ func GetHostname(ip string) *string {
 func PutHostname(ip, hostname string) error {
 
 	q := `DELETE FROM cache_hostname WHERE ipaddress = ?;`
-
 	if _, err := db.Exec(q, ip); err != nil {
 		return err
 	}
