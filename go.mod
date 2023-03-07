@@ -9,3 +9,8 @@ require (
 	github.com/gosnmp/gosnmp v1.35.0
 	github.com/jmoiron/sqlx v1.3.5
 )
+
+require (
+	github.com/apex/log v1.9.0 // indirect
+	github.com/pkg/errors v0.8.1 // indirect
+)
